@@ -1,0 +1,9 @@
+applications:
+  - name: atlassian-access-user-audit
+    buildpacks:
+      - python_buildpack
+    disk_quota: 256M
+    memory: 64M
+    instances: 1
+    stack: cflinuxfs3
+    no-route: true
