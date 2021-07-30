@@ -62,3 +62,6 @@ docs/_build/
 target/
 
 .idea/
+
+#env file
+.env
