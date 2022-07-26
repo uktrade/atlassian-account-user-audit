@@ -105,7 +105,7 @@ def cleanup(
         ]
 
         for user in not_active_users:
-            msg = {"message": {reason}}
+            msg = {"message": reason}
             print(
                 f"cleaning up: {user['name']} because their last access was: {user['last_active']}"
             )
