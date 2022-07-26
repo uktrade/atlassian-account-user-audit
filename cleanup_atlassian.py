@@ -89,7 +89,7 @@ def cleanup(
 
     if MAX_USER_AGE_MONTHS < 1:
         logger.error(f"MAX_USER_AGE_MONTHS is set to {MAX_USER_AGE_MONTHS}. You don't want to set this less than 1!")
-        raise RuntimeError(f"MAX_USER_AGE_MONTHS is set to {MAX_USER_AGE_MONTHS}. You don't want to set this less than 1!")
+        exit(1)
 
     atlassian_client = Atlassian(base_url=base_url, auth=BearerToken(api_key))
 
