@@ -1,9 +1,9 @@
-import os
-from datetime import datetime
 import logging
-import ecs_logging
+import os
 import sys
+from datetime import datetime
 
+import ecs_logging
 import fire
 import uplink
 from dateutil.parser import parse as parse_dt
