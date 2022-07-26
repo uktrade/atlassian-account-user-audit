@@ -36,7 +36,8 @@ ATLASSIAN_AUTH_TOKEN = os.environ["ATLASSIAN_AUTH_TOKEN"].strip("\r")
 MAX_USER_AGE_MONTHS = int(os.environ.get("MAX_USER_AGE_MONTHS", 3))
 EARLIST_USER_DATE = (datetime.today() - relativedelta(months=MAX_USER_AGE_MONTHS)).strftime("%d-%m-%Y")
 MAX_DISABLE_RATE = int(os.environ.get("MAX_DISABLE_RATE", 10))
-ENABLE_DEACTIVATIONS = os.environ.get("ENABLE_DEACTIVATIONS", False)
+TRUE_VALUES = ('on', 'yes', 'true')
+ENABLE_DEACTIVATIONS = os.environ.get("ENABLE_DEACTIVATIONS", "").lower() in TRUE_VALUES
 REASON = "automated cleanup script"
 
 
