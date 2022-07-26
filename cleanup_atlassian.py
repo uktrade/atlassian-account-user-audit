@@ -1,5 +1,8 @@
 import os
 from datetime import datetime
+import logging
+import ecs_logging
+import sys
 
 import fire
 import uplink
@@ -8,6 +11,23 @@ from dateutil.relativedelta import relativedelta
 from dateutil.tz import UTC
 from furl import furl
 from uplink.auth import BearerToken
+
+# Set up logging (ECS)
+logger = logging.getLogger("CLEANUP-ATLASSIAN")
+logger.setLevel(os.environ.get("LOGGING_LEVEL", logging.DEBUG))
+
+# Warnings and above log to the stderr stream
+stderr_handler = logging.StreamHandler(stream=sys.stderr)
+stderr_handler.setLevel(logging.WARNING)
+stderr_handler.setFormatter(ecs_logging.StdlibFormatter())
+logger.addHandler(stderr_handler)
+
+# Events below Warning log to the stdout stream
+stdout_handler = logging.StreamHandler(stream=sys.stdout)
+stdout_handler.setLevel(logging.DEBUG)
+stdout_handler.addFilter(lambda record: record.levelno < logging.WARNING)
+stdout_handler.setFormatter(ecs_logging.StdlibFormatter())
+logger.addHandler(stdout_handler)
 
 # set Variables
 ATLASSIAN_URL = os.environ["ATLASSIAN_URL"].strip("\r")
