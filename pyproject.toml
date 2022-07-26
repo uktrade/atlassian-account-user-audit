@@ -11,6 +11,7 @@ uplink = "^0.9.4"
 furl = "^2.1.2"
 python-dateutil = "^2.8.2"
 fire = "^0.4.0"
+ecs-logging = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
 
