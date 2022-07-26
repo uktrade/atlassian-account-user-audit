@@ -35,4 +35,5 @@ uritemplate==3.0.1; python_version >= "2.7" and python_full_version < "3.0.0" or
 urllib3==1.26.6; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version < "4" \
     --hash=sha256:39fb8672126159acb139a7718dd10806104dec1e2f0f6c88aab05d17df10c8d4 \
     --hash=sha256:f57b4c16c62fa2760b7e3d97c35b255512fb6b59a259730f36ba32ce9f8e342f
-ecs-logging==2.0.0; python_version >= "3.6"
+ecs-logging==2.0.0; python_version >= "3.6" \
+    --hash=sha256:8acbc164a7c14d96cb6b3b3e90e8b6972f93ddbd0215e71c6823856518f742ff
