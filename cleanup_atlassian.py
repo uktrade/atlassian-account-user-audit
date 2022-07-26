@@ -86,9 +86,12 @@ def cleanup(
     atlassian_client = Atlassian(base_url=base_url, auth=BearerToken(api_key))
 
     # get org id from name
+    logger.info("Reading organisations")
     resp = atlassian_client.get_orgs()
+    logger.info(f"Response: {resp}")
 
     organisations = resp.json()["data"]
+    logger.info(f"Organisations: {organisations}")
 
     c = get_cursor(resp.json())
 
@@ -100,13 +103,17 @@ def cleanup(
     orgId = None
 
     for org in organisations:
+        logger.info(f"Organisation: {org}")
         if (org["attributes"]["name"]).lower() == organisation_name.lower():
             orgId = org["id"]
+            logger.info(f"Organisation ID: {orgId}")
             break
 
     # if we find org id!
     if orgId:
+        logger.info("Reading organisation users")
         resp = atlassian_client.get_users(org_id=orgId)
+        logger.info(f"Response: {resp}")
 
         users = resp.json()["data"]
 
@@ -115,14 +122,18 @@ def cleanup(
             resp = atlassian_client.get_users(org_id=orgId, cursor=c)
             users.extend(resp.json()["data"])
             c = get_cursor(resp.json())
+        logger.info(f"Total users: {len(users)}")
 
         active_users = [x for x in users if x["account_status"] == "active"]
+        logger.info(f"Total active users: {len(active_users)}")
 
+        logger.info(f"Get aged users, active but not logged in since {last_active}")
         not_active_users = [
             x
             for x in active_users
             if "last_active" in x and parse_dt(x["last_active"]) < parse_dt(last_active)
         ]
+        logger.info(f"Total activated aged users: {len(not_active_users)}")
 
         for user in not_active_users:
             msg = {"message": reason}
@@ -132,6 +143,7 @@ def cleanup(
             atlassian_client.disable_user(user["account_id"], body=msg)
 
     else:
+        logger.error( f'Error: Atlassian organisation "{organisation_name}" not found')
         raise RuntimeError(
             f'Error: Atlassian organisation "{organisation_name}" not found'
         )
