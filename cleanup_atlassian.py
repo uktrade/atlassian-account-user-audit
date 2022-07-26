@@ -35,6 +35,8 @@ ATLASSIAN_ORG_NAME = os.environ["ATLASSIAN_ORG_NAME"].strip("\r")
 ATLASSIAN_AUTH_TOKEN = os.environ["ATLASSIAN_AUTH_TOKEN"].strip("\r")
 MAX_USER_AGE_MONTHS = int(os.environ.get("MAX_USER_AGE_MONTHS", 3))
 EARLIST_USER_DATE = (datetime.today() - relativedelta(months=MAX_USER_AGE_MONTHS)).strftime("%d-%m-%Y")
+MAX_DISABLE_RATE = int(os.environ.get("MAX_DISABLE_RATE", 10))
+ENABLE_DEACTIVATIONS = os.environ.get("ENABLE_DEACTIVATIONS", False)
 REASON = "automated cleanup script"
 
 
@@ -82,6 +84,8 @@ def cleanup(
 
     logger.info(f"MAX_USER_AGE_MONTHS: {MAX_USER_AGE_MONTHS}")
     logger.info(f"EARLIST_USER_DATE: {EARLIST_USER_DATE}")
+    logger.info(f"MAX_DISABLE_RATE: {MAX_DISABLE_RATE}")
+    logger.info(f"ENABLE_DEACTIVATIONS: {ENABLE_DEACTIVATIONS}")
 
     atlassian_client = Atlassian(base_url=base_url, auth=BearerToken(api_key))
 
@@ -135,13 +139,17 @@ def cleanup(
         ]
         logger.info(f"Total activated aged users: {len(not_active_users)}")
 
-        for user in not_active_users:
+        for index, user in enumerate(not_active_users):
             msg = {"message": reason}
-            print(
-                f"cleaning up: {user['name']} because their last access was: {user['last_active']}"
-            )
-            atlassian_client.disable_user(user["account_id"], body=msg)
-
+            if index >= MAX_DISABLE_RATE:
+                logger.info(f"Hit rate limit of {MAX_DISABLE_RATE}. Stopping.")
+                break
+            if ENABLE_DEACTIVATIONS:
+                logger.info(f"Disabling user '{user['name']}' (index {index}) because their last access was: {user['last_active']}")
+                resp = atlassian_client.disable_user(user["account_id"], body=msg)
+                logger.info(f"Response: {resp}")
+            else:
+                logger.info(f"User deactivation not enabled. But user '{user['name']}' (index {index}) would be deactivated because their last access was: {user['last_active']}")
     else:
         logger.error( f'Error: Atlassian organisation "{organisation_name}" not found')
         raise RuntimeError(
