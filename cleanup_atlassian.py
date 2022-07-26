@@ -33,7 +33,8 @@ logger.addHandler(stdout_handler)
 ATLASSIAN_URL = os.environ["ATLASSIAN_URL"].strip("\r")
 ATLASSIAN_ORG_NAME = os.environ["ATLASSIAN_ORG_NAME"].strip("\r")
 ATLASSIAN_AUTH_TOKEN = os.environ["ATLASSIAN_AUTH_TOKEN"].strip("\r")
-THREE_MONTHS_AGO = (datetime.today() - relativedelta(months=3)).strftime("%d-%m-%Y")
+MAX_USER_AGE_MONTHS = int(os.environ.get("MAX_USER_AGE_MONTHS", 3))
+EARLIST_USER_DATE = (datetime.today() - relativedelta(months=MAX_USER_AGE_MONTHS)).strftime("%d-%m-%Y")
 REASON = "automated cleanup script"
 
 
@@ -68,7 +69,7 @@ def cleanup(
     organisation_name=ATLASSIAN_ORG_NAME,
     api_key=ATLASSIAN_AUTH_TOKEN,
     reason=REASON,
-    last_active=(datetime.strptime(THREE_MONTHS_AGO, "%d-%m-%Y")).replace(tzinfo=UTC).isoformat(),
+    last_active=(datetime.strptime(EARLIST_USER_DATE, "%d-%m-%Y")).replace(tzinfo=UTC).isoformat(),
 ):
     """
     Cleanup inactive atlassian accounts
@@ -78,6 +79,9 @@ def cleanup(
     :param reason: reason to disable account
     :param last_active: remove users that haven't logged in since this date in %d-%m-%Y (e.g. 1st April 2021 would be 1-4-2021)
     """
+
+    logger.info(f"MAX_USER_AGE_MONTHS: {MAX_USER_AGE_MONTHS}")
+    logger.info(f"EARLIST_USER_DATE: {EARLIST_USER_DATE}")
 
     atlassian_client = Atlassian(base_url=base_url, auth=BearerToken(api_key))
 
