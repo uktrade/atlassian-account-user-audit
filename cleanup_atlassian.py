@@ -48,7 +48,7 @@ def cleanup(
     organisation_name=ATLASSIAN_ORG_NAME,
     api_key=ATLASSIAN_AUTH_TOKEN,
     reason=REASON,
-    last_active=THREE_MONTHS_AGO,
+    last_active=(datetime.strptime(THREE_MONTHS_AGO, "%d-%m-%Y")).replace(tzinfo=UTC).isoformat(),
 ):
     """
     Cleanup inactive atlassian accounts
@@ -58,10 +58,6 @@ def cleanup(
     :param reason: reason to disable account
     :param last_active: remove users that haven't logged in since this date in %d-%m-%Y (e.g. 1st April 2021 would be 1-4-2021)
     """
-
-    last_active = (
-        (datetime.strptime(last_active, "%d-%m-%Y")).replace(tzinfo=UTC).isoformat()
-    )
 
     atlassian_client = Atlassian(base_url=base_url, auth=BearerToken(api_key))
 
