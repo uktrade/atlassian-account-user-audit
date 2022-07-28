@@ -1,5 +1,5 @@
 # Atlassian audit script
-To disable all atlassin user who have not logged in since last active date ( default 3 months ago)
+To disable all atlassin user who have not logged in since last active date ( default 3 months ago). This can be configured with the optional env var MAX_USER_AGE_MONTHS.
 
 ## Usage
 
@@ -20,6 +20,11 @@ You can speicfy some more parms, to see full list just do<br>
 ```python cleanup_atlassian.py --help```
 
 ## Environment Variables
-- ATLASSIAN_URL=\<atlassian admin api url\><br>
-- ATLASSIAN_ORG_NAME=\<atlassian organisation name\><br>
-- ATLASSIAN_AUTH_TOKEN=\<atlassian admin api token\><br>
+| Variable | Description | Default |
+| -------- | ----------- | ------- |
+| ATLASSIAN_URL | \<atlassian admin api url\><br> | |
+| ATLASSIAN_ORG_NAME | \<atlassian organisation name\><br> | |
+| ATLASSIAN_AUTH_TOKEN | \<atlassian admin api token\><br> | |
+| MAX_USER_AGE_MONTHS | Max user age (months) | `3` |
+| MAX_DISABLE_RATE | Rate limit. Max users to disable in any one run | `10` |
+| ENABLE_DEACTIVATIONS | Set to `True` to enable deactivations | `False` |
