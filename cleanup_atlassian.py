@@ -137,11 +137,24 @@ def cleanup(
         logger.info(f"Total active users: {len(active_users)}")
 
         logger.info(f"Get aged users, active but not logged in since {last_active}")
-        not_active_users = [
-            x
-            for x in active_users
-            if "last_active" in x and parse_dt(x["last_active"]) < parse_dt(last_active)
-        ]
+
+        not_active_users = []
+        for user in active_users:
+            #if product_access is not an empty list
+            if user["product_access"]:
+                product_last_access_dates = []
+                for product in user["product_access"]:
+                    if "last_active" in product:
+                        product_last_access_dates.append(
+                            datetime.strptime(product["last_active"],'%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=UTC).isoformat()
+                        )
+                # check if all product access dates are older than 3 months if so add user to not_active_user
+                if all(parse_dt(date) < parse_dt(last_active) for date in product_last_access_dates):
+                    not_active_users.append(user)
+            #if product_access is an empty list we resot to checking top level last_active date
+            elif  "last_active" in user and parse_dt(user["last_active"]) < parse_dt(last_active):
+                    not_active_users.append(user)
+
         logger.info(f"Total activated aged users: {len(not_active_users)}")
 
         for index, user in enumerate(not_active_users):
