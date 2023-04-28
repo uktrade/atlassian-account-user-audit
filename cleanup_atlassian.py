@@ -34,11 +34,14 @@ ATLASSIAN_URL = os.environ["ATLASSIAN_URL"].strip("\r")
 ATLASSIAN_ORG_NAME = os.environ["ATLASSIAN_ORG_NAME"].strip("\r")
 ATLASSIAN_AUTH_TOKEN = os.environ["ATLASSIAN_AUTH_TOKEN"].strip("\r")
 MAX_USER_AGE_MONTHS = int(os.environ.get("MAX_USER_AGE_MONTHS", 3))
-EARLIST_USER_DATE = (datetime.today() - relativedelta(months=MAX_USER_AGE_MONTHS)).strftime("%d-%m-%Y")
+EARLIST_USER_DATE = (
+    datetime.today() - relativedelta(months=MAX_USER_AGE_MONTHS)
+).strftime("%d-%m-%Y")
 MAX_DISABLE_RATE = int(os.environ.get("MAX_DISABLE_RATE", 10))
-TRUE_VALUES = ('on', 'yes', 'true')
+TRUE_VALUES = ("on", "yes", "true")
 ENABLE_DEACTIVATIONS = os.environ.get("ENABLE_DEACTIVATIONS", "").lower() in TRUE_VALUES
 REASON = "automated cleanup script"
+BOT_USERS = [email.strip() for email in os.environ.get("BOT_USERS").split(",")]
 
 
 class Atlassian(uplink.Consumer):
@@ -72,7 +75,9 @@ def cleanup(
     organisation_name=ATLASSIAN_ORG_NAME,
     api_key=ATLASSIAN_AUTH_TOKEN,
     reason=REASON,
-    last_active=(datetime.strptime(EARLIST_USER_DATE, "%d-%m-%Y")).replace(tzinfo=UTC).isoformat(),
+    last_active=(datetime.strptime(EARLIST_USER_DATE, "%d-%m-%Y"))
+    .replace(tzinfo=UTC)
+    .isoformat(),
 ):
     """
     Cleanup inactive atlassian accounts
@@ -83,13 +88,16 @@ def cleanup(
     :param last_active: remove users that haven't logged in since this date in %d-%m-%Y (e.g. 1st April 2021 would be 1-4-2021)
     """
 
-    logger.info(f"MAX_USER_AGE_MONTHS: {MAX_USER_AGE_MONTHS}")
-    logger.info(f"EARLIST_USER_DATE: {EARLIST_USER_DATE}")
-    logger.info(f"MAX_DISABLE_RATE: {MAX_DISABLE_RATE}")
-    logger.info(f"ENABLE_DEACTIVATIONS: {ENABLE_DEACTIVATIONS}")
+    logger.info("MAX_USER_AGE_MONTHS: %s", MAX_USER_AGE_MONTHS)
+    logger.info("EARLIST_USER_DATE: %s", EARLIST_USER_DATE)
+    logger.info("MAX_DISABLE_RATE: %s", MAX_DISABLE_RATE)
+    logger.info("ENABLE_DEACTIVATIONS: %s", ENABLE_DEACTIVATIONS)
 
     if MAX_USER_AGE_MONTHS < 1:
-        logger.error(f"MAX_USER_AGE_MONTHS is set to {MAX_USER_AGE_MONTHS}. You don't want to set this less than 1!")
+        logger.error(
+            "MAX_USER_AGE_MONTHS is set to %s. You don't want to set this less than 1!",
+            MAX_USER_AGE_MONTHS,
+        )
         exit(1)
 
     atlassian_client = Atlassian(base_url=base_url, auth=BearerToken(api_key))
@@ -97,10 +105,10 @@ def cleanup(
     # get org id from name
     logger.info("Reading organisations")
     resp = atlassian_client.get_orgs()
-    logger.info(f"Response: {resp}")
+    logger.info("Response: %s", resp)
 
     organisations = resp.json()["data"]
-    logger.info(f"Organisations: {organisations}")
+    logger.info("Organisations: %s", organisations)
 
     c = get_cursor(resp.json())
 
@@ -112,18 +120,17 @@ def cleanup(
     orgId = None
 
     for org in organisations:
-        logger.info(f"Organisation: {org}")
+        logger.info("Organisation: %s", org)
         if (org["attributes"]["name"]).lower() == organisation_name.lower():
             orgId = org["id"]
-            logger.info(f"Organisation ID: {orgId}")
+            logger.info("Organisation ID: %s", orgId)
             break
 
     # if we find org id!
     if orgId:
         logger.info("Reading organisation users")
         resp = atlassian_client.get_users(org_id=orgId)
-        logger.info(f"Response: {resp}")
-
+        logger.info("Response: %s", resp)
         users = resp.json()["data"]
 
         c = get_cursor(resp.json())
@@ -131,45 +138,69 @@ def cleanup(
             resp = atlassian_client.get_users(org_id=orgId, cursor=c)
             users.extend(resp.json()["data"])
             c = get_cursor(resp.json())
-        logger.info(f"Total users: {len(users)}")
+        logger.info("Total users: %s", len(users))
 
         active_users = [x for x in users if x["account_status"] == "active"]
-        logger.info(f"Total active users: {len(active_users)}")
+        logger.info("Total active users: %s", len(active_users))
 
-        logger.info(f"Get aged users, active but not logged in since {last_active}")
+        logger.info("Get aged users, active but not logged in since %s", last_active)
 
         not_active_users = []
         for user in active_users:
-            #if product_access is not an empty list
+            # if user is a bot user, ignore and continue
+            if user["email"] in BOT_USERS:
+                logger.info("skipping because,%s is a bot user", user["name"])
+                continue
+            # if product_access is not an empty list
             if user["product_access"]:
                 product_last_access_dates = []
                 for product in user["product_access"]:
                     if "last_active" in product:
                         product_last_access_dates.append(
-                            datetime.strptime(product["last_active"],'%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=UTC).isoformat()
+                            datetime.strptime(
+                                product["last_active"], "%Y-%m-%dT%H:%M:%S.%fZ"
+                            )
+                            .replace(tzinfo=UTC)
+                            .isoformat()
                         )
-                # check if all product access dates are older than 3 months if so add user to not_active_user
-                if all(parse_dt(date) < parse_dt(last_active) for date in product_last_access_dates):
+                # check if all product access dates are older than 3 months,
+                # if so add user to not_active_user
+                if all(
+                    parse_dt(date) < parse_dt(last_active)
+                    for date in product_last_access_dates
+                ):
                     not_active_users.append(user)
-            #if product_access is an empty list we resot to checking top level last_active date
-            elif  "last_active" in user and parse_dt(user["last_active"]) < parse_dt(last_active):
-                    not_active_users.append(user)
+            # if product_access is an empty list we resort to checking top level last_active date
+            elif "last_active" in user and parse_dt(user["last_active"]) < parse_dt(
+                last_active
+            ):
+                not_active_users.append(user)
 
-        logger.info(f"Total activated aged users: {len(not_active_users)}")
+        logger.info("Total activated aged users: %s", len(not_active_users))
 
         for index, user in enumerate(not_active_users):
             msg = {"message": reason}
             if index >= MAX_DISABLE_RATE:
-                logger.info(f"Hit rate limit of {MAX_DISABLE_RATE}. Stopping.")
+                logger.info("Hit rate limit of %s. Stopping.", MAX_DISABLE_RATE)
                 break
             if ENABLE_DEACTIVATIONS:
-                logger.info(f"Disabling user '{user['name']}' (index {index}) because their last access was: {user['last_active']}")
+                logger.info(
+                    "Disabling user '%s' (index %s) because their last access was: %s",
+                    user["name"],
+                    index,
+                    user["last_active"],
+                )
                 resp = atlassian_client.disable_user(user["account_id"], body=msg)
-                logger.info(f"Response: {resp}")
+                logger.info("Response: %s", resp)
             else:
-                logger.info(f"User deactivation not enabled. But user '{user['name']}' (index {index}) would be deactivated because their last access was: {user['last_active']}")
+                logger.info(
+                    "User deactivation not enabled. But user '%s' (index %s) would be deactivated because their last access was: %s",
+                    user["name"],
+                    index,
+                    user["last_active"],
+                )
     else:
-        logger.error( f'Error: Atlassian organisation "{organisation_name}" not found')
+        logger.error('Error: Atlassian organisation "%s" not found', organisation_name)
         raise RuntimeError(
             f'Error: Atlassian organisation "{organisation_name}" not found'
         )

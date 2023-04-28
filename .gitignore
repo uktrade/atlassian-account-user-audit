@@ -1,8 +1,8 @@
 #### joe made this: http://goel.io/joe
 
 #####=== Python ===#####
-.env
-
+**/.env
+.devcontainer/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
