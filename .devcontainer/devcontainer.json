@@ -1,0 +1,74 @@
+{
+  "name": "script_runner",
+  "dockerComposeFile": "./compose.yaml",
+  "service": "script_runner",
+
+  "workspaceFolder": "/vscode/workspace",
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/vscode/workspace,type=bind"
+  ],
+
+  "onCreateCommand": "pip install black isort && pip install -r requirements.txt",
+  "overrideCommand": false,
+  "shutdownAction": "stopCompose",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "streetsidesoftware.code-spell-checker",
+        "esbenp.prettier-vscode",
+        "eamodio.gitlens",
+        "codezombiech.gitignore",
+        "fabiospampinato.vscode-diff",
+        "ms-python.python",
+        "ms-python.isort",
+        "ms-python.vscode-pylance",
+        "ms-python.pylint",
+        "DavidAnson.vscode-markdownlint",
+        "shd101wyy.markdown-preview-enhanced"
+      ],
+      "settings": {
+        "cSpell.language": "en-GB",
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": false,
+        "editor.minimap.enabled": false,
+        "breadcrumbs.enabled": false,
+
+        "git.autofetch": true,
+        "editor.tabCompletion": "on",
+        "files.trimTrailingWhitespace": true,
+
+        // do not apply any of the settings to following files or files with in given directory
+        "files.exclude": {
+          "**/.git": true,
+          "**/.DS_Store": true,
+          "**/Thumbs.db": true
+        },
+
+        //markdown settings
+        "[markdown]": {
+          "editor.codeActionsOnSave": {
+            "source.fixAll.markdownlint": true
+          },
+          "editor.formatOnSave": true,
+          "editor.formatOnPaste": true
+        },
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.python",
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+          },
+          "editor.formatOnSave": true,
+          "editor.formatOnPaste": false
+        },
+        "python.linting.pylintEnabled": true,
+        "isort.args": ["--profile", "black"],
+        "python.languageServer": "Pylance",
+        "python.linting.lintOnSave": true,
+        "python.formatting.provider": "black",
+        "python.terminal.activateEnvironment": false
+      }
+    }
+  }
+}

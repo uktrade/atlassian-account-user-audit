@@ -31,3 +31,7 @@ To disable all atlassian user who have not logged in since last active date ( de
 | MAX_DISABLE_RATE     | Rate limit. Max users to disable in any one run                 | `10`         |
 | ENABLE_DEACTIVATIONS | Set to `True` to enable deactivations                           | `False`      |
 | BOT_USERS            | comma separated list of emails that we never wish to deactivate | empty string |
+
+## Dev
+
+for VSCode DevContainer based setup refer to [Readme.md](.devcontainer/README.md)

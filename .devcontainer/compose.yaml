@@ -1,0 +1,12 @@
+services:
+  script_runner:
+    image: python:3.10
+    container_name: script_runer
+    hostname: script_runer
+    env_file:
+      - .env
+    dns:
+      - 8.8.8.8
+      - 4.4.4.4
+    stdin_open: true
+    tty: true
