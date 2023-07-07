@@ -1,0 +1,12 @@
+    version: 0.2
+    
+    phases:
+      # install:
+
+      pre_build:
+        commands:
+          - codebuild-breakpoint
+
+      build:
+        commands:
+          - /work/build.sh
