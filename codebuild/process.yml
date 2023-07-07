@@ -1,0 +1,4 @@
+application:
+  name: atlassian-account-user-audit
+  process:
+    - job
