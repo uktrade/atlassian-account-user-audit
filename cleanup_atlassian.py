@@ -194,7 +194,7 @@ def cleanup(
                     "Disabling user '%s' (index %s) because their last access was: %s",
                     user["name"],
                     index,
-                    user["last_active"],
+                    user.get("last_active","'none'"),
                 )
                 resp = atlassian_client.disable_user(user["account_id"], body=msg)
                 logger.info("Response: %s", resp)
@@ -203,7 +203,7 @@ def cleanup(
                     "User deactivation not enabled. But user '%s' (index %s) would be deactivated because their last access was: %s",
                     user["name"],
                     index,
-                    user["last_active"],
+                    user.get("last_active","'none'"),
                 )
     else:
         logger.error('Error: Atlassian organisation "%s" not found', organisation_name)
