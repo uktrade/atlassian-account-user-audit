@@ -192,7 +192,7 @@ def cleanup(
             if ENABLE_DEACTIVATIONS:
                 logger.info(
                     "Disabling user '%s' (index %s) because their last access was: %s",
-                    user["name"],
+                    user.get("name","none"),
                     index,
                     user.get("last_active","'none'"),
                 )
@@ -201,7 +201,7 @@ def cleanup(
             else:
                 logger.info(
                     "User deactivation not enabled. But user '%s' (index %s) would be deactivated because their last access was: %s",
-                    user["name"],
+                    user.get("name","none"),
                     index,
                     user.get("last_active","'none'"),
                 )
