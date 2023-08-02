@@ -200,9 +200,10 @@ def cleanup(
                 logger.info("Response: %s", resp)
             else:
                 logger.info(
-                    "User deactivation not enabled. But user '%s' (index %s) would be deactivated because their last access was: %s",
+                    "User deactivation not enabled. But user '%s' (index %s) with email '%s' would be deactivated because their last access was: %s",
                     user.get("name","none"),
                     index,
+                    user.get("email","none"),
                     user.get("last_active","'none'"),
                 )
     else:
