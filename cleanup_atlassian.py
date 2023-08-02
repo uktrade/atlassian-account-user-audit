@@ -156,16 +156,8 @@ def cleanup(
                 product_last_access_dates = []
                 for product in user["product_access"]:
                     if "last_active" in product:
-                        # Having to strip out the "microseconds" here since strptime supports
-                        # 6 DPs and the Atlassian API has started returning 9.
-                        # Nanosecond accuracy not required here!
-                        # Recent example: '2023-08-01T15:19:32.354230769Z'
-                        # Throws a ValueError: time data does not match format '%Y-%m-%dT%H:%M:%S.%fZ'
                         product_last_access_dates.append(
-                            datetime.strptime(
-                                product["last_active"].split(".")[0]+"Z",
-                                "%Y-%m-%dT%H:%M:%SZ"
-                            )
+                            parse_dt(product["last_active"])
                             .replace(tzinfo=UTC)
                             .isoformat()
                         )
