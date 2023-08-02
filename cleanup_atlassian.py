@@ -184,19 +184,19 @@ def cleanup(
             if ENABLE_DEACTIVATIONS:
                 logger.info(
                     "Disabling user '%s' (index %s) because their last access was: %s",
-                    user.get("name","none"),
+                    user.get("name"),
                     index,
-                    user.get("last_active","'none'"),
+                    user.get("last_active"),
                 )
                 resp = atlassian_client.disable_user(user["account_id"], body=msg)
                 logger.info("Response: %s", resp)
             else:
                 logger.info(
                     "User deactivation not enabled. But user '%s' (index %s) with email '%s' would be deactivated because their last access was: %s",
-                    user.get("name","none"),
+                    user.get("name"),
                     index,
-                    user.get("email","none"),
-                    user.get("last_active","'none'"),
+                    user.get("email"),
+                    user.get("last_active"),
                 )
     else:
         logger.error('Error: Atlassian organisation "%s" not found', organisation_name)
