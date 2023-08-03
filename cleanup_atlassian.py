@@ -183,9 +183,10 @@ def cleanup(
                 break
             if ENABLE_DEACTIVATIONS:
                 logger.info(
-                    "Disabling user '%s' (index %s) because their last access was: %s",
+                    "Disabling user '%s' (index %s) with email '%s' because their last access was: %s",
                     user.get("name"),
                     index,
+                    user.get("email"),
                     user.get("last_active"),
                 )
                 resp = atlassian_client.disable_user(user["account_id"], body=msg)
