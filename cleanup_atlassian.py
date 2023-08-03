@@ -157,9 +157,7 @@ def cleanup(
                 for product in user["product_access"]:
                     if "last_active" in product:
                         product_last_access_dates.append(
-                            datetime.strptime(
-                                product["last_active"], "%Y-%m-%dT%H:%M:%S.%fZ"
-                            )
+                            parse_dt(product["last_active"])
                             .replace(tzinfo=UTC)
                             .isoformat()
                         )
@@ -186,18 +184,19 @@ def cleanup(
             if ENABLE_DEACTIVATIONS:
                 logger.info(
                     "Disabling user '%s' (index %s) because their last access was: %s",
-                    user["name"],
+                    user.get("name"),
                     index,
-                    user["last_active"],
+                    user.get("last_active"),
                 )
                 resp = atlassian_client.disable_user(user["account_id"], body=msg)
                 logger.info("Response: %s", resp)
             else:
                 logger.info(
-                    "User deactivation not enabled. But user '%s' (index %s) would be deactivated because their last access was: %s",
-                    user["name"],
+                    "User deactivation not enabled. But user '%s' (index %s) with email '%s' would be deactivated because their last access was: %s",
+                    user.get("name"),
                     index,
-                    user["last_active"],
+                    user.get("email"),
+                    user.get("last_active"),
                 )
     else:
         logger.error('Error: Atlassian organisation "%s" not found', organisation_name)
