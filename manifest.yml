@@ -1,0 +1,6 @@
+---
+applications:
+  - name: atlassian-account-user-audit
+    buildpacks:
+      - python_buildpack
+    stack: cflinuxfs4
