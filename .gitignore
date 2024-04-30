@@ -2,7 +2,6 @@
 
 #####=== Python ===#####
 **/.env
-.devcontainer/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -66,3 +65,8 @@ target/
 
 #env file
 .env
+
+.venv/*
+
+*.json
+!.vscode/settings.json
