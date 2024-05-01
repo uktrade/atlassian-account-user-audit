@@ -1,0 +1,37 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  "files.autoSave": "afterDelay",
+
+  "editor.formatOnSave": true,
+
+  "cSpell.language": "en-GB",
+
+  "files.associations": {
+    "**/templates/**/*.html": "django-html",
+    "**/*.html": "html"
+  },
+
+  "emmet.includeLanguages": {
+    "django-html": "html"
+  },
+
+  "djlint.enableLinting": true,
+
+  "[django-html][html]": {
+    "editor.defaultFormatter": "monosans.djlint",
+    "editor.formatOnSave": true
+  },
+
+  "djlint.ignore": ["H014"],
+
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "always"
+    }
+  },
+  "isort.args": ["--profile", "black"],
+  "cSpell.words": ["WAGTAILADMIN"]
+}
