@@ -1,0 +1,29 @@
+{
+  "name": "atlassian-account-audit"
+  "image": "python:3.11",
+
+  "initializeCommand": "touch .devcontainer/.env",
+
+  "runArgs": ["--env-file", "${localWorkspaceFolder}/.devcontainer/.env"],
+
+  "onCreateCommand": ["/bin/bash", "-c", "source .devcontainer/on-create.sh"],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "codezombiech.gitignore",
+        "esbenp.prettier-vscode",
+        "streetsidesoftware.code-spell-checker",
+        "ms-python.python",
+        "monosans.djlint",
+        "ms-python.pylint",
+        "ms-python.black-formatter",
+        "Tyriar.lorem-ipsum",
+        "mhutchie.git-graph",
+        "batisteo.vscode-django",
+        "ms-python.isort",
+        "github.vscode-github-actions"
+      ]
+    }
+  }
+}

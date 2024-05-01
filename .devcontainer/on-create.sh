@@ -71,8 +71,17 @@ function install_poetry_packages(){
         poetry install
         poetry self add poetry-plugin-export
         poetry self add poetry-plugin-up
-
     fi
+}
+
+function install_pre-commit(){
+
+    if [ -f ".pre-commit-config.yaml" ]
+    then
+        pre-commit autoupdate
+        pre-commit installl
+    fi
+
 }
 
 function main(){
@@ -81,6 +90,7 @@ function main(){
     install_packages
     install_poetry
     configure_git
+    install_pre-commit
     install_git_bash_prompt
     install_poetry_packages
 }
