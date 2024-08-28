@@ -11,6 +11,6 @@ repos:
         verbose: false
       - id: poetry-export
         name: requirements-dev.txt
-        args: ["--dev", "-f", "requirements.txt", "-o", "requirements-dev.txt"]
+        args:
+          ["--with=dev", "-f", "requirements.txt", "-o", "requirements-dev.txt"]
         verbose: false
-        stages: [post-checkout, post-merge]
