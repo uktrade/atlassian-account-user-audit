@@ -209,7 +209,7 @@ def cleanup(
 
 class HealthCheck(SimpleHTTPRequestHandler):
     def healthcheck_GET(self):
-        if self.path == "/healthcheck":
+        if self.path == "/healthcheck/":
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
