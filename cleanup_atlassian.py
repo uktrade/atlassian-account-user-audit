@@ -12,6 +12,8 @@ from dateutil.tz import UTC
 from furl import furl
 from uplink.auth import BearerToken
 
+from http.server import SimpleHTTPRequestHandler, HTTPServer
+
 # Set up logging (ECS)
 logger = logging.getLogger("CLEANUP-ATLASSIAN")
 logger.setLevel(os.environ.get("LOGGING_LEVEL", logging.DEBUG))
@@ -205,6 +207,15 @@ def cleanup(
             f'Error: Atlassian organisation "{organisation_name}" not found'
         )
 
+class HealthCheck(SimpleHTTPRequestHandler):
+    def healthcheck_GET(self):
+        if self.path == "/healthcheck":
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(b'{"status": "healthy"}')
+        else:
+            super().healthcheck_GET()
 
 if __name__ == "__main__":
     fire.Fire(cleanup)
