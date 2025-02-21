@@ -14,6 +14,10 @@ from uplink.auth import BearerToken
 
 import requests
 
+from flask import Flask
+
+app = Flask(__name__)
+
 # Set up logging (ECS)
 logger = logging.getLogger("CLEANUP-ATLASSIAN")
 logger.setLevel(os.environ.get("LOGGING_LEVEL", logging.DEBUG))
@@ -215,7 +219,11 @@ def healthcheck():
     if response.status_code == 200:
         return "OK"
     else:
-        return "Health check failed!!"  
+        return "Health check failed!!"
+    
+@app.route('/healthcheck', methods=['GET'])
+def healthcheck_endpoint():
+    return healthcheck()
 
 if __name__ == "__main__":
     fire.Fire({
