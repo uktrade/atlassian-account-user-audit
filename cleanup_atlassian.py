@@ -210,6 +210,7 @@ def cleanup(
         )
 
 class HealthCheck(uplink.Consumer):    
+    base_url = os.environ["BASE_URL"]
     @uplink.response_handler
     
     def handle_response(self, response):
