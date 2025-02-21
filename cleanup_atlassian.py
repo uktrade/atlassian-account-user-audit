@@ -12,7 +12,7 @@ from dateutil.tz import UTC
 from furl import furl
 from uplink.auth import BearerToken
 
-import json
+import requests
 
 # Set up logging (ECS)
 logger = logging.getLogger("CLEANUP-ATLASSIAN")
@@ -45,7 +45,7 @@ ENABLE_DEACTIVATIONS = os.environ.get("ENABLE_DEACTIVATIONS", "").lower() in TRU
 REASON = "automated cleanup script"
 BOT_USERS = [email.strip() for email in os.environ.get("BOT_USERS").split(",")]
 
-BASE_URL = os.environ["BASE_URL"]
+APP_BASE_URL = os.environ["BASE_URL"]
 
 
 class Atlassian(uplink.Consumer):
@@ -209,20 +209,16 @@ def cleanup(
             f'Error: Atlassian organisation "{organisation_name}" not found'
         )
 
-class HealthCheck(uplink.Consumer):    
-    base_url = os.environ["BASE_URL"]
-    @uplink.response_handler
-    
-    def handle_response(self, response):
-        if response.status_code == 200:
-            return response.json()
-        else:
-            response.raise_for_status()
-    @uplink.get("/healthcheck")
-
-    def get_health(self):
-        """Application Health Status"""
-        pass
+def healthcheck():
+    app_base_url = APP_BASE_URL = os.environ["BASE_URL"]
+    response = requests.get(app_base_url/healthcheck)
+    if response.status_code == 200:
+        return "OK"
+    else:
+        return "Health check failed!!"  
 
 if __name__ == "__main__":
-    fire.Fire(cleanup)
+    fire.Fire({
+        'cleanup': cleanup,
+        'health_check': healthcheck
+        })
