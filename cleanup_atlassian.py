@@ -12,6 +12,10 @@ from dateutil.tz import UTC
 from furl import furl
 from uplink.auth import BearerToken
 
+import requests
+
+from flask import Flask
+
 app = Flask(__name__)
 
 # Set up logging (ECS)
@@ -209,5 +213,20 @@ def cleanup(
             f'Error: Atlassian organisation "{organisation_name}" not found'
         )
 
+def healthcheck():
+    app_base_url = APP_BASE_URL = os.environ["BASE_URL"]
+    response = requests.get(f"{app_base_url}/healthcheck")
+    if response.status_code == 200:
+        return "OK"
+    else:
+        return "Health check failed!!"
+    
+@app.route('/healthcheck', methods=['GET'])
+def healthcheck_endpoint():
+    return healthcheck()
+
 if __name__ == "__main__":
-    fire.Fire(cleanup)
+    fire.Fire({
+        'cleanup': cleanup,
+        'health_check': healthcheck
+        })
