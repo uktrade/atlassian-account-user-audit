@@ -1,0 +1,16 @@
+certifi
+charset-normalizer
+ecs-logging
+fire
+furl
+idna
+orderedmultidict
+python-dateutil
+requests
+six
+termcolor
+uplink
+uritemplate
+urllib3
+flask
+gunicorn

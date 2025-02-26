@@ -15,8 +15,14 @@ from uplink.auth import BearerToken
 import requests
 
 from flask import Flask
+import threading
+import http.server
+import socketserver
+import signal 
 
 app = Flask(__name__)
+
+shutdown_event = threading.Event()
 
 # Set up logging (ECS)
 logger = logging.getLogger("CLEANUP-ATLASSIAN")
@@ -215,7 +221,8 @@ def cleanup(
 
 def healthcheck():
     app_base_url = APP_BASE_URL = os.environ["BASE_URL"]
-    response = requests.get(f"{app_base_url}/healthcheck")
+    url = "https://{app_base_url}:8080/healthcheck"
+    response = requests.get(url)
     if response.status_code == 200:
         return "OK"
     else:
@@ -225,8 +232,14 @@ def healthcheck():
 def healthcheck_endpoint():
     return healthcheck()
 
+def run_healthcheck():
+    app.run(threaded=True, use_reloader=False, port=8080, debug=True)
+
+def handle_shutdown(signum, frame):
+    shutdown_event.set()
+
 if __name__ == "__main__":
     fire.Fire({
         'cleanup': cleanup,
-        'health_check': healthcheck
+        'health_check': run_healthcheck        
         })
