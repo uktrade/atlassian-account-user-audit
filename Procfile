@@ -1,1 +1,2 @@
-web: sh -c "gunicorn -w 4 -b 0.0.0.0:5000 cleanup_atlassian:app && python -m http.server --directory /app/fake 8000"
+web: exit 1
+cleanup_atlassian: python cleanup_atlassian.py

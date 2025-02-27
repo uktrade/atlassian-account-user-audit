@@ -12,18 +12,6 @@ from dateutil.tz import UTC
 from furl import furl
 from uplink.auth import BearerToken
 
-import requests
-
-from flask import Flask
-import threading
-import http.server
-import socketserver
-import signal 
-
-app = Flask(__name__)
-
-shutdown_event = threading.Event()
-
 # Set up logging (ECS)
 logger = logging.getLogger("CLEANUP-ATLASSIAN")
 logger.setLevel(os.environ.get("LOGGING_LEVEL", logging.DEBUG))
@@ -54,8 +42,6 @@ TRUE_VALUES = ("on", "yes", "true")
 ENABLE_DEACTIVATIONS = os.environ.get("ENABLE_DEACTIVATIONS", "").lower() in TRUE_VALUES
 REASON = "automated cleanup script"
 BOT_USERS = [email.strip() for email in os.environ.get("BOT_USERS").split(",")]
-
-APP_BASE_URL = os.environ["BASE_URL"]
 
 
 class Atlassian(uplink.Consumer):
@@ -219,27 +205,6 @@ def cleanup(
             f'Error: Atlassian organisation "{organisation_name}" not found'
         )
 
-def healthcheck():
-    app_hostname = APP_BASE_URL = os.environ["BASE_URL"]
-    url = f"https://{app_hostname}/healthcheck"
-    response = requests.get(url)
-    if response.status_code == 200:
-        return "OK"
-    else:
-        return "Health check failed!!"
-    
-@app.route('/healthcheck', methods=['GET'])
-def healthcheck_endpoint():
-    return healthcheck()
-
-def run_healthcheck():
-    app.run(threaded=True, use_reloader=False, port=8080, debug=True)
-
-def handle_shutdown(signum, frame):
-    shutdown_event.set()
 
 if __name__ == "__main__":
-    fire.Fire({
-        'cleanup': cleanup,
-        'health_check': run_healthcheck        
-        })
+    fire.Fire(cleanup)
