@@ -221,7 +221,7 @@ def cleanup(
 
 def healthcheck():
     app_hostname = APP_BASE_URL = os.environ["BASE_URL"]
-    url = f"https://{app_hostname}:5000/healthcheck"
+    url = f"https://{app_hostname}/healthcheck"
     response = requests.get(url)
     if response.status_code == 200:
         return "OK"
@@ -233,7 +233,7 @@ def healthcheck_endpoint():
     return healthcheck()
 
 def run_healthcheck():
-    app.run(threaded=True, use_reloader=False, port=5000, debug=True)
+    app.run(threaded=True, use_reloader=False, port=8080, debug=True)
 
 def handle_shutdown(signum, frame):
     shutdown_event.set()
