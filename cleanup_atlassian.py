@@ -221,8 +221,7 @@ def cleanup(
 
 def healthcheck():
     app_base_url = APP_BASE_URL = os.environ["BASE_URL"]
-    url = "https://{app_base_url}:5000/healthcheck"
-    print({url})
+    url = f"https://{app_base_url}:5000/healthcheck"
     response = requests.get(url)
     if response.status_code == 200:
         return "OK"
